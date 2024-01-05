@@ -2,7 +2,13 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * This class represent the main logic of the game, holding the game state and performing actions as required.
+ */
 public class GameLogic implements PlayableLogic {
+    /**
+     * The width and height of the game board, currently the board can only be square.
+     */
     public static final int BOARD_SIZE = 11;
     private final ConcretePlayer p1 = new ConcretePlayer(true);
     private final ConcretePlayer p2 = new ConcretePlayer(false);
@@ -26,6 +32,10 @@ public class GameLogic implements PlayableLogic {
         pieceSet.addAll(loaded.values().stream().map(p -> (ConcretePiece) p).collect(Collectors.toSet()));
     }
 
+    /**
+     * Constructs a new game logic and starts the game logically.
+     * <p>Note that currently the initial board state is loaded from a hard-coded text file.</p>
+     */
     public GameLogic() {
         initializeBoard();
     }
@@ -34,6 +44,20 @@ public class GameLogic implements PlayableLogic {
         if (currentTurn == p2) currentTurn = p1;
         else if (currentTurn == p1) currentTurn = p2;
     }
+
+    /**
+     * Attempts to move a piece from {@code src} to {@code dst}, returning whether the move occurred or not.
+     * <br>On a successful move, this method will also check if any captured need to occur and process them.
+     * <p>A legal move must:
+     * <br>1. Be onto a different position on the same row or on the same column.
+     * <br>2. Have a piece in {@code src}.
+     * <br>3. Move a piece whose owner is the current turn player.
+     * <br>4. Not move a pawn into a corner.
+     * <br>5. Not try to move through another piece.</p>
+     * @param src the starting position of the piece.
+     * @param dst the destination position for the piece
+     * @return true if the move is legal and occurred
+     */
     @Override
     public boolean move(Position src, Position dst) {
         // the following line is a workaround to the fact that dst is always a new instance, when we want it to be
@@ -100,9 +124,8 @@ public class GameLogic implements PlayableLogic {
     }
 
     /**
-     * Attempts a capture from a given position to an unconstructed position
-     * <p>If all conditions for the capture are fulfilled, the piece at the captured position is removed from the board
-     *
+     * Attempts a capture from a given position to an unconstructed position.
+     * <br>If all conditions for the capture are fulfilled, the captured piece is removed from the board.
      * @param capturerP position from which the capture is trying to happen, should always have a piece in it
      * @param capturedX x coordinate trying to be captured
      * @param capturedY y coordinate trying to be captured
@@ -142,21 +165,38 @@ public class GameLogic implements PlayableLogic {
         return new AbstractMap.SimpleEntry<>(capturedP, captured);
     }
 
+    /**
+     * Returns the piece at the specified position
+     * @param position the position for which to retrieve the piece.
+     * @return the piece at the specified position, or {@code null} if the square is empty
+     */
     @Override
     public Piece getPieceAtPosition(Position position) {
         return pieces.get(position);
     }
 
+    /**
+     * Returns the {@code Player} object for player 1 (the defender)
+     * @return player 1
+     */
     @Override
     public Player getFirstPlayer() {
         return p1;
     }
 
+    /**
+     * Returns the {@code Player} object for player 2 (the attacked)
+     * @return player 2
+     */
     @Override
     public Player getSecondPlayer() {
         return p2;
     }
 
+    /**
+     * This method checks if a player has won, according to the game rules.
+     * @return the winning player, or {@code null} if no player has won yet
+     */
     private ConcretePlayer checkWinner() {
         Position kingPos = pieces.entrySet().stream()
                 .filter(e -> e.getValue() instanceof King)
@@ -184,16 +224,30 @@ public class GameLogic implements PlayableLogic {
         return null;
     }
 
+    /**
+     * This method checks whether the game is finished.
+     * @return true if the game is finished according to the game rules
+     */
+
     @Override
     public boolean isGameFinished() {
         return checkWinner() != null;
     }
 
+    /**
+     * This method checks which player's turn it currently is.
+     * @return true if it is currently player 2's turn (the attacker)
+     */
     @Override
     public boolean isSecondPlayerTurn() {
         return currentTurn == p2;
     }
 
+    /**
+     * This method resets the game to it initial state. This resets the board state, piece and position statistics,
+     * and clears the history.
+     * <br>The number of wins for each player is not cleared by this operation.
+     */
     @Override
     public void reset() {
         posSet.clear();
@@ -202,8 +256,12 @@ public class GameLogic implements PlayableLogic {
         initializeBoard();
     }
 
+    /**
+     * This method undoes the last performed move.
+     * <br>This returns the board to its previous state, and removes the move from the pieces' and positions' histories.
+     */
     @Override
-    public void undoLastMove() {    // TODO: make sure log is not corrupted by undo
+    public void undoLastMove() {
         GameMove move;
         try {
             move = history.pop();
@@ -224,14 +282,24 @@ public class GameLogic implements PlayableLogic {
         changeTurn();
     }
 
+    /**
+     * Returns the board's size (which is both the height and the width).
+     * @return the board's size
+     */
     @Override
     public int getBoardSize() {
         return BOARD_SIZE;
     }
+
+    /**
+     * This method performs game-end logging, extracting the information from the game state members.
+     * @param winner which player won, required for sorting purposes
+     */
     private void logGame(Player winner) {
         GameLogger logger = new GameLogger(System.out);
 
-        Function<ConcretePiece, String> pieceFormat = p -> "" + (p instanceof King ? 'K' : (p.getOwner().isPlayerOne() ? 'D' : 'A')) + p.id + ": ";
+        Function<ConcretePiece, String> pieceFormat =
+                p -> "" + (p instanceof King ? 'K' : (p.getOwner().isPlayerOne() ? 'D' : 'A')) + p.id + ": ";
         Function<Position, String> posFormat = p -> "(" + p.x() + ", " + p.y() + ")";
 
         Function<ConcretePiece, String> moveFormat = p -> {
@@ -244,15 +312,18 @@ public class GameLogic implements PlayableLogic {
             sb.append("]");
             return sb.toString();
         };
-        logger.logStream(pieceSet, new ConcretePieceMoveCountComparator(winner), cp -> cp.getNumOfSteps() > 0, moveFormat);
+        logger.logStream(pieceSet, new ConcretePieceMoveCountComparator(winner),
+                cp -> cp.getNumOfSteps() > 0, moveFormat);
 
         PawnCaptureComparator capComp = new PawnCaptureComparator(winner);
         Function<Pawn, String> capFormat = p -> pieceFormat.apply(p) + p.getCaptures() + " kills";
-        Collection<Pawn> pawnSet = pieceSet.stream().filter(cp -> cp instanceof Pawn).map(cp -> (Pawn) cp).collect(Collectors.toSet());
+        Collection<Pawn> pawnSet = pieceSet.stream()
+                .filter(cp -> cp instanceof Pawn).map(cp -> (Pawn) cp).collect(Collectors.toSet());
         logger.logStream(pawnSet, capComp, p -> p.getCaptures() > 0, capFormat);
 
         Function<ConcretePiece, String> distFormat = cp -> pieceFormat.apply(cp) + cp.getTotalMoveDist() + " squares";
-        logger.logStream(pieceSet, new ConcretePieceMoveDistComparator(winner), cp -> cp.getTotalMoveDist() > 0, distFormat);
+        logger.logStream(pieceSet, new ConcretePieceMoveDistComparator(winner),
+                cp -> cp.getTotalMoveDist() > 0, distFormat);
 
         Function<Position, String> stepFormat = p -> posFormat.apply(p) + p.getSteppedCount() + " pieces";
         logger.logStream(posSet, new PositionSteppedComparator(), p -> p.getSteppedCount() >= 2, stepFormat);

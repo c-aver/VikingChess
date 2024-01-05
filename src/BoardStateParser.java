@@ -8,6 +8,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * This class holds a parser for parsing text files into {@code Position} to {@code Piece} maps that can be inserted
+ * into a board
+ */
 public class BoardStateParser {
     Player p1;
     Player p2;
@@ -69,6 +73,11 @@ public class BoardStateParser {
         }
         Position pos = new Position(Integer.parseInt(matcher.group("x")),
                                     Integer.parseInt(matcher.group("y")));
+        Piece pie = parsePiece(matcher, pos);
+        return new AbstractMap.SimpleEntry<>(pos, pie);
+    }
+
+    private Piece parsePiece(Matcher matcher, Position pos) {
         Piece pie;
         int ownerN = Integer.parseInt(matcher.group("player"));
         Player owner;
@@ -90,6 +99,6 @@ public class BoardStateParser {
         } else {
             throw new IllegalArgumentException("Unknown type");
         }
-        return new AbstractMap.SimpleEntry<>(pos, pie);
+        return pie;
     }
 }

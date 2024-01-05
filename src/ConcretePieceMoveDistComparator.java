@@ -1,15 +1,23 @@
 import java.util.Comparator;
 
+/**
+ * Compares two {@code ConcretePiece}s according to order specified in part 2 section 3 of the assignment.
+ */
 public class ConcretePieceMoveDistComparator implements Comparator<ConcretePiece> {
     private final Player winner;
+    /**
+     * Constructs a new comparator with a specified winner, the identity of the winner has implications for the
+     * comparison.
+     * @param w the winner
+     */
     public ConcretePieceMoveDistComparator(Player w) {
         winner = w;
     }
     /**
      * Compare two concrete pieces according to the following rules:
-     * <br>First, reverse order by total move distance
-     * <br>If they are equal, forward order by their IDs
-     * <br>If they are also equal, piece whose owner is the winner comes first
+     * <br>First, reverse order by total move distance.
+     * <br>If they are equal, forward order by their IDs.
+     * <br>If they are also equal, piece whose owner is the winner comes first.
      * @param o1 the first object to be compared.
      * @param o2 the second object to be compared.
      * @return integer according to order definition

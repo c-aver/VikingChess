@@ -1,20 +1,25 @@
 import java.util.Comparator;
 
 /**
- * Comparator class for comparing pawns according to the number of captures
+ * Compares two {@code Pawn}s according to order specified in part 2 section s of the assignment.
  */
 public class PawnCaptureComparator implements Comparator<Pawn> {
     private final Player winner;
+    /**
+     * Constructs a new comparator with a specified winner, the identity of the winner has implications for the
+     * comparison.
+     * @param w the winner
+     */
     public PawnCaptureComparator(Player w) {
         winner = w;
     }
     /**
      * Compare two pawns according to the following rules:
-     * <br>First, reverse order by number of captures
-     * <br>If they are equal, forward order by their IDs
-     * <br>If they are also equal, piece whose owner is the winner comes first
-     * @param o1 the first object to be compared.
-     * @param o2 the second object to be compared.
+     * <br>First, reverse order by number of captures.
+     * <br>If they are equal, forward order by their IDs.
+     * <br>If they are also equal, piece whose owner is the winner comes first.
+     * @param o1 the first object to be compared
+     * @param o2 the second object to be compared
      * @return integer according to order definition
      */
     @Override
