@@ -138,7 +138,7 @@ public class GameLogic implements PlayableLogic {
      * @param capturerP position from which the capture is trying to happen, should always have a piece in it
      * @param capturedX x coordinate trying to be captured
      * @param capturedY y coordinate trying to be captured
-     * @return the piece that was captured, or {@code null} if no capture occurred
+     * @return the piece that was captured with its position, or null if no capture occurred
      * @throws IllegalArgumentException if {@code capturerP} does not host a piece
      */
     private Map.Entry<Position, Piece> attemptCapture(Position capturerP, int capturedX, int capturedY) {
