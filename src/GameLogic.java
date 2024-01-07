@@ -32,7 +32,7 @@ public class GameLogic implements PlayableLogic {
     private void initializeBoard() {
         pieces.clear();
         BoardStateLoader parser = new BoardStateLoader(p1, p2);
-        Map<Position, Piece> loaded = parser.loadFile("resources/InitialBoardState.txt");
+        Map<Position, Piece> loaded = parser.loadFile("src/resources/InitialBoardState.txt");
         if (loaded == null) {
             throw new IllegalArgumentException();
         }
