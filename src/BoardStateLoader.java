@@ -1,7 +1,7 @@
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
  * into a board.
  */
 public class BoardStateLoader {
-    Player p1;
-    Player p2;
+    private final Player p1;
+    private final Player p2;
 
     /**
      * Constructs a parser linked to the {@code Player} objects to be assigned as owners to new parsed pieces.
@@ -34,19 +34,18 @@ public class BoardStateLoader {
      * <br>{t} is the type of the piece ('p' for pawn, 'k' for king).
      * <br>{id} is the ID of the piece for logging purposes.
      * <p>Lines are only allowed to either match the format precisely or be empty.
-     * @param filePath the path to the file to be parsed
+     * @param resourcePath the path to the file to be parsed
      * @return a map of the loaded pieces
      * @throws RuntimeException if there was an error opening or reading the file
      * @throws IllegalArgumentException if a line does not match the format
      */
-    public Map<Position, Piece> loadFile(String filePath) {
-        Map<Position, Piece> result = new HashMap<>();
-        BufferedReader reader;
-        try {
-            reader = new BufferedReader(new FileReader(filePath));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("Could not find file \"" + filePath + "\"");
+    public Map<Position, Piece> loadFile(String resourcePath) {
+        InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourcePath);
+        if (stream == null) {
+            throw new RuntimeException("Resource does not exists: " + resourcePath);
         }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+        Map<Position, Piece> result = new HashMap<>();
         String line;
         try {
             line = reader.readLine();
@@ -58,7 +57,7 @@ public class BoardStateLoader {
                 line = reader.readLine();
             }
         } catch (IOException e) {
-            throw new RuntimeException("Error reading file \"" + filePath + "\"");
+            throw new RuntimeException("Error reading resource: " + resourcePath);
         }
         return result;
     }
