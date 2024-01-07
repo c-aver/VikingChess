@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  * This class holds a parser for parsing text files into {@code Position} to {@code Piece} maps that can be inserted
  * into a board.
  */
-public class BoardStateParser {
+public class BoardStateLoader {
     Player p1;
     Player p2;
 
@@ -21,7 +21,7 @@ public class BoardStateParser {
      * @param p1 owner assigned to pieces with "1" in the relevant field
      * @param p2 owner assigned to pieces with "2" in the relevant field
      */
-    public BoardStateParser(Player p1, Player p2) {
+    public BoardStateLoader(Player p1, Player p2) {
         this.p1 = p1;
         this.p2 = p2;
     }

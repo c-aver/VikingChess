@@ -31,7 +31,7 @@ public class GameLogic implements PlayableLogic {
 
     private void initializeBoard() {
         pieces.clear();
-        BoardStateParser parser = new BoardStateParser(p1, p2);
+        BoardStateLoader parser = new BoardStateLoader(p1, p2);
         Map<Position, Piece> loaded = parser.loadFile("resources/InitialBoardState.txt");
         if (loaded == null) {
             throw new IllegalArgumentException();
@@ -81,12 +81,12 @@ public class GameLogic implements PlayableLogic {
             int x = src.x();
             if (src.y() < dst.y()) {    // moving down
                 for (int y = src.y() + 1; y <= dst.y(); ++y) {
-                    if (pieces.containsKey(new Position(x, y))) return false;
+                    if (getPieceAtPosition(new Position(x, y)) != null) return false;
                 }
             }
             if (src.y() > dst.y()) { // moving up
                 for (int y = src.y() - 1; y >= dst.y(); --y) {
-                    if (pieces.containsKey(new Position(x, y))) return false;
+                    if (getPieceAtPosition(new Position(x, y)) != null) return false;
                 }
             }
         }
@@ -94,12 +94,12 @@ public class GameLogic implements PlayableLogic {
             int y = src.y();
             if (src.x() < dst.x()) {    // moving right
                 for (int x = src.x() + 1; x <= dst.x(); ++x) {
-                    if (pieces.containsKey(new Position(x, y))) return false;
+                    if (getPieceAtPosition(new Position(x, y)) != null) return false;
                 }
             }
             if (src.x() > dst.x()) { // moving left
                 for (int x = src.x() - 1; x >= dst.x(); --x) {
-                    if (pieces.containsKey(new Position(x, y))) return false;
+                    if (getPieceAtPosition(new Position(x, y)) != null) return false;
                 }
             }
         }
@@ -151,7 +151,7 @@ public class GameLogic implements PlayableLogic {
         Piece captured = getPieceAtPosition(capturedP);
         if (captured == null) return null;     // no piece to capture
         if (captured.getOwner() == capturer.getOwner()) return null;   // can't capture an ally
-        if (captured instanceof King) return null;     // king isn't captured normally, checked in isGameFinished()
+        if (captured instanceof King) return null;     // king isn't captured normally, checked in checkWinner()
         int dX = capturedP.x() - capturerP.x();
         int dY = capturedP.y() - capturerP.y();
         if (!Position.isInsideBoard(capturedP.x() + dX, capturedP.y() + dY)) {
