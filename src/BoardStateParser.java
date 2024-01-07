@@ -10,14 +10,14 @@ import java.util.regex.Pattern;
 
 /**
  * This class holds a parser for parsing text files into {@code Position} to {@code Piece} maps that can be inserted
- * into a board
+ * into a board.
  */
 public class BoardStateParser {
     Player p1;
     Player p2;
 
     /**
-     * Constructs a parser linked to the {@code Player} objects to be assigned as owners to new parsed pieces
+     * Constructs a parser linked to the {@code Player} objects to be assigned as owners to new parsed pieces.
      * @param p1 owner assigned to pieces with "1" in the relevant field
      * @param p2 owner assigned to pieces with "2" in the relevant field
      */
@@ -27,17 +27,17 @@ public class BoardStateParser {
     }
 
     /**
-     * Loads a {@code Position} - {@code Piece} mapping from a file, parsing each piece from a line
+     * Loads a {@code Position} to {@code Piece} mapping from a file, parsing each piece from a line
      * <p>The format is as follows: "({x},{y})->{p}{t}{id}" (whitespaces inside the line are ignored):
-     * <br>{x} and {y} are the coordinates of the piece
-     * <br>{p} is the number of the player that owns the piece (either 1 or 2)
-     * <br>{t} is the type of the piece ('p' for pawn, 'k' for king)
-     * <br>{id} is the ID of the piece for logging purposes
-     * <p>Lines are only allowed to either match the format precisely or be empty
+     * <br>{x} and {y} are the coordinates of the piece.
+     * <br>{p} is the number of the player that owns the piece (either 1 or 2).
+     * <br>{t} is the type of the piece ('p' for pawn, 'k' for king).
+     * <br>{id} is the ID of the piece for logging purposes.
+     * <p>Lines are only allowed to either match the format precisely or be empty.
      * @param filePath the path to the file to be parsed
-     * @return a map of the loaded pieces, or null
+     * @return a map of the loaded pieces
      * @throws RuntimeException if there was an error opening or reading the file
-     * @throws IllegalArgumentException if line does not match the format
+     * @throws IllegalArgumentException if a line does not match the format
      */
     public Map<Position, Piece> loadFile(String filePath) {
         Map<Position, Piece> result = new HashMap<>();
@@ -64,7 +64,6 @@ public class BoardStateParser {
     }
 
     private Map.Entry<Position,Piece> parseLine(String line) {
-
         Pattern pattern = Pattern.compile(
                 "\\((?<x>\\d+),(?<y>\\d+)\\)->(?<player>[12])(?<type>[pk])(?<id>\\d+)");
         Matcher matcher = pattern.matcher(line.replaceAll("\\s", ""));
@@ -79,9 +78,9 @@ public class BoardStateParser {
 
     private Piece parsePiece(Matcher matcher, Position pos) {
         Piece pie;
+
         int ownerN = Integer.parseInt(matcher.group("player"));
         Player owner;
-
         if (ownerN == 1) {
             owner = p1;
         } else if (ownerN == 2) {
@@ -99,6 +98,7 @@ public class BoardStateParser {
         } else {
             throw new IllegalArgumentException("Unknown type");
         }
+
         return pie;
     }
 }

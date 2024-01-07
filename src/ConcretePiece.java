@@ -6,7 +6,9 @@ import java.util.Stack;
  */
 public abstract class ConcretePiece implements Piece {
     private final Player owner;
-    // for logging purposed only
+    /**
+     * The identification number of the piece, for logging purposes only.
+     */
     protected final int id;
     private final Stack<Position> moveHistory = new Stack<>();
 

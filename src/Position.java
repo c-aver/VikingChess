@@ -1,6 +1,10 @@
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This class represents a valid position on the board, mainly x and y coordinates.
+ * This class also holds the history of the pieces that stepped here for logging purposes.
+ */
 public final class Position {
     private static final int BOARD_SIZE = GameLogic.BOARD_SIZE;
     private final int x;
@@ -69,7 +73,7 @@ public final class Position {
     /**
      * Override of {@code Object::hashCode} to reflect the fact that {@code x} and {@code y} have limited ranges.
      * <p>This method allows {@code HashTable}s, {@code HashMap}s, and {@code HashSet}s
-     * to group {@code Position}s based on their coordinated alone.</p>
+     * to group {@code Position}s based on their coordinates alone.</p>
      * @return a unique number for each possible position in the board
      */
     @Override

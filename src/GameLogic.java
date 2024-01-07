@@ -18,6 +18,15 @@ public class GameLogic implements PlayableLogic {
     private final Map<Position, Piece> pieces = new HashMap<>();
     private final Set<Position> posSet = new HashSet<>();   // set of known position for logging purposes
     private final Set<ConcretePiece> pieceSet = new HashSet<>();    // set of known pieces for logging purposes
+
+    /**
+     * This record holds the information on a game move that is required to undo it.
+     * @param piece the piece that was moved
+     * @param source the piece's previous position
+     * @param destination the piece's new position
+     * @param captures a map of the pieces that were captured, tied to their death location
+     */
+    private record GameMove(ConcretePiece piece, Position source, Position destination, Map<Position, Piece> captures) { }
     private final Stack<GameMove> history = new Stack<>();
 
     private void initializeBoard() {
@@ -166,8 +175,8 @@ public class GameLogic implements PlayableLogic {
     }
 
     /**
-     * Returns the piece at the specified position
-     * @param position the position for which to retrieve the piece.
+     * Returns the piece at the specified position.
+     * @param position the position for which to retrieve the piece
      * @return the piece at the specified position, or {@code null} if the square is empty
      */
     @Override
@@ -176,7 +185,7 @@ public class GameLogic implements PlayableLogic {
     }
 
     /**
-     * Returns the {@code Player} object for player 1 (the defender)
+     * Returns the {@code Player} object for player 1 (the defender).
      * @return player 1
      */
     @Override
@@ -185,7 +194,7 @@ public class GameLogic implements PlayableLogic {
     }
 
     /**
-     * Returns the {@code Player} object for player 2 (the attacked)
+     * Returns the {@code Player} object for player 2 (the attacker).
      * @return player 2
      */
     @Override
