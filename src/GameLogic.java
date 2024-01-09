@@ -263,6 +263,7 @@ public class GameLogic implements PlayableLogic {
         pieceSet.clear();
         history.clear();
         initializeBoard();
+        currentTurn = p2;
     }
 
     /**
