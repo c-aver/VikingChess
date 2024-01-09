@@ -26,7 +26,7 @@ public class PawnCaptureComparator implements Comparator<Pawn> {
     public int compare(Pawn o1, Pawn o2) {
         int cComp = Integer.compare(o2.getCaptures(), o1.getCaptures());
         if (cComp != 0) return cComp;
-        int iComp = Integer.compare(o1.id, o2.id);
+        int iComp = Integer.compare(o1.getId(), o2.getId());
         if (iComp != 0) return iComp;
         if (o1.getOwner() == o2.getOwner()) return 0;   // should be unreachable
         if (o1.getOwner() == winner) return -1;

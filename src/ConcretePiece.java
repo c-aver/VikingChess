@@ -9,7 +9,7 @@ public abstract class ConcretePiece implements Piece {
     /**
      * The identification number of the piece, for logging purposes only.
      */
-    protected final int id;
+    private final int id;
     private final Stack<Position> moveHistory = new Stack<>();
 
     /**
@@ -77,5 +77,9 @@ public abstract class ConcretePiece implements Piece {
     public void undoMove() {
         if (moveHistory.size() <= 1) throw new RuntimeException("Trying to undo initial location");
         moveHistory.pop();
+    }
+
+    public int getId() {
+        return id;
     }
 }
