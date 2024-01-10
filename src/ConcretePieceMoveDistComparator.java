@@ -26,7 +26,7 @@ public class ConcretePieceMoveDistComparator implements Comparator<ConcretePiece
     public int compare(ConcretePiece o1, ConcretePiece o2) {
         int dComp = Integer.compare(o2.getTotalMoveDist(), o1.getTotalMoveDist());
         if (dComp != 0) return dComp;
-        int iComp = Integer.compare(o1.id, o2.id);
+        int iComp = Integer.compare(o1.getId(), o2.getId());
         if (iComp != 0) return iComp;
         if (o1.getOwner() == o2.getOwner()) return 0;   // should be unreachable
         if (o1.getOwner() == winner) return -1;

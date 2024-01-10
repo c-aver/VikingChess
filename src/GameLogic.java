@@ -263,6 +263,7 @@ public class GameLogic implements PlayableLogic {
         pieceSet.clear();
         history.clear();
         initializeBoard();
+        currentTurn = p2;
     }
 
     /**
@@ -308,7 +309,7 @@ public class GameLogic implements PlayableLogic {
         GameLogger logger = new GameLogger(System.out);
 
         Function<ConcretePiece, String> pieceFormat =
-                p -> "" + (p instanceof King ? 'K' : (p.getOwner().isPlayerOne() ? 'D' : 'A')) + p.id + ": ";
+                p -> "" + (p instanceof King ? 'K' : (p.getOwner().isPlayerOne() ? 'D' : 'A')) + p.getId() + ": ";
         Function<Position, String> posFormat = p -> "(" + p.x() + ", " + p.y() + ")";
 
         Function<ConcretePiece, String> moveFormat = p -> {

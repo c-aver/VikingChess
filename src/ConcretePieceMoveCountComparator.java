@@ -28,6 +28,6 @@ public class ConcretePieceMoveCountComparator implements Comparator<ConcretePiec
         if (o1.getOwner() != o2.getOwner()) return o1.getOwner() == winner ? -1 : 1;
         int dComp = Integer.compare(o1.getNumOfSteps(), o2.getNumOfSteps());
         if (dComp != 0) return dComp;
-        return Integer.compare(o1.id, o2.id);
+        return Integer.compare(o1.getId(), o2.getId());
     }
 }

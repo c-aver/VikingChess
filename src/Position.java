@@ -14,8 +14,8 @@ public final class Position {
 
     /**
      * Checks if an (x, y) pair represents a coordinate inside the board.
-     * @param x x coordinate of the pair to check
-     * @param y y coordinate of the pair to check
+     * @param x x coordinate of the position to check
+     * @param y y coordinate of the position to check
      * @return true if the specified position is inside the board
      */
     public static boolean isInsideBoard(int x, int y) {
@@ -42,16 +42,17 @@ public final class Position {
 
     /**
      * Compute the absolute distance between two points that lie on an axis-parallel line (arguments are commutative).
-     * @param src first point
-     * @param dst second point
-     * @return non-negative distance between the parameters
+     * <br>If either parameters in {@code null}, returns 0, this is for fault-proofing total move distance calculations.
+     * @param p1 first point
+     * @param p2 second point
+     * @return non-negative distance between the provided positions
      * @throws RuntimeException if parameters do not lie on an axis-parallel line
      */
-    public static int straightDist(Position src, Position dst) {
-        if (src == null || dst == null) return 0;
-        if (src.x() == dst.x()) return Math.abs(src.y() - dst.y());
-        if (src.y() == dst.y()) return Math.abs(src.x() - dst.x());
-        throw new RuntimeException("src and dst are not on a straight line");
+    public static int straightDist(Position p1, Position p2) {
+        if (p1 == null || p2 == null) return 0;
+        if (p1.x() == p2.x()) return Math.abs(p1.y() - p2.y());
+        if (p1.y() == p2.y()) return Math.abs(p1.x() - p2.x());
+        throw new RuntimeException("p1 and p2 are not on a straight line");
     }
 
     /**
@@ -82,7 +83,7 @@ public final class Position {
     }
 
     /**
-     * Override of {@code equals} to only use {@code x} and {@code y} coordinates for checking equality.
+     * Override of {@code Object::equals} to only use {@code x} and {@code y} coordinates for checking equality.
      * <br>This is consistent with {@code hashCode}.
      * @param o object to check equality to
      * @return true if {@code o} is a {@code Position} with the same coordinates
@@ -118,7 +119,7 @@ public final class Position {
     }
 
     /**
-     * Undoes a step and removes the stepper from the history.
+     * Undoes a step and removes the step from the history.
      * @param stepper the {@code Piece} to undo a step for
      * @throws RuntimeException if {@code stepper} never stepped here
      */
