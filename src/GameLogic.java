@@ -272,11 +272,11 @@ public class GameLogic implements PlayableLogic {
     @Override
     public void undoLastMove() {
         GameMove move;
-        try {
-            move = history.pop();
-        } catch (EmptyStackException e) {
-            return;     // no move to undo, that's fine
+        if (history.isEmpty()) {
+            return;
         }
+        move = history.pop();
+
 
         ConcretePiece stepper = move.piece();
         stepper.undoMove();
