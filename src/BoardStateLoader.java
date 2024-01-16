@@ -27,16 +27,16 @@ public class BoardStateLoader {
     }
 
     /**
-     * Loads a {@code Position} to {@code Piece} mapping from a file, parsing each piece from a line
+     * Loads a {@code Position} to {@code Piece} mapping from a resource file, parsing each piece from a line.
      * <p>The format is as follows: "({x},{y})->{p}{t}{id}" (whitespaces inside the line are ignored):
      * <br>{x} and {y} are the coordinates of the piece.
      * <br>{p} is the number of the player that owns the piece (either 1 or 2).
      * <br>{t} is the type of the piece ('p' for pawn, 'k' for king).
      * <br>{id} is the ID of the piece for logging purposes.
      * <p>Lines are only allowed to either match the format precisely or be empty.
-     * @param resourcePath the path to the file to be parsed
+     * @param resourcePath the path to the resource file to be parsed
      * @return a map of the loaded pieces
-     * @throws RuntimeException if there was an error opening or reading the file
+     * @throws RuntimeException if there was an error opening or reading the resource
      * @throws IllegalArgumentException if a line does not match the format
      */
     public Map<Position, Piece> loadFile(String resourcePath) {
