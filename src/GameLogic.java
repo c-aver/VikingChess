@@ -17,9 +17,9 @@ public class GameLogic implements PlayableLogic {
      * The width and height of the game board, currently the board can only be square.
      */
     public static final int BOARD_SIZE = 11;
+
     private final ConcretePlayer p1 = new ConcretePlayer(true);
     private final ConcretePlayer p2 = new ConcretePlayer(false);
-
     private Player currentTurn = p2;
 
     private final Map<Position, Piece> pieces = new HashMap<>();
@@ -40,9 +40,6 @@ public class GameLogic implements PlayableLogic {
         pieces.clear();
         BoardStateLoader parser = new BoardStateLoader(p1, p2);
         Map<Position, Piece> loaded = parser.loadFile("resources/InitialBoardState.txt");
-        if (loaded == null) {
-            throw new IllegalArgumentException();
-        }
         pieces.putAll(loaded);
         posSet.addAll(loaded.keySet());
         pieceSet.addAll(loaded.values().stream().map(p -> (ConcretePiece) p).collect(Collectors.toSet()));
@@ -63,7 +60,7 @@ public class GameLogic implements PlayableLogic {
 
     /**
      * Attempts to move a piece from {@code src} to {@code dst}, returning whether the move occurred or not.
-     * <br>On a successful move, this method will also check if any captured need to occur and process them.
+     * <br>On a successful move, this method will also check if any captures need to occur and performs them.
      * <p>A legal move must:
      * <br>1. Be onto a different position on the same row or on the same column.
      * <br>2. Have a piece in {@code src}.
@@ -91,7 +88,7 @@ public class GameLogic implements PlayableLogic {
                     if (getPieceAtPosition(new Position(x, y)) != null) return false;
                 }
             }
-            if (src.y() > dst.y()) { // moving up
+            if (src.y() > dst.y()) {    // moving up
                 for (int y = src.y() - 1; y >= dst.y(); --y) {
                     if (getPieceAtPosition(new Position(x, y)) != null) return false;
                 }
@@ -104,7 +101,7 @@ public class GameLogic implements PlayableLogic {
                     if (getPieceAtPosition(new Position(x, y)) != null) return false;
                 }
             }
-            if (src.x() > dst.x()) { // moving left
+            if (src.x() > dst.x()) {    // moving left
                 for (int x = src.x() - 1; x >= dst.x(); --x) {
                     if (getPieceAtPosition(new Position(x, y)) != null) return false;
                 }
@@ -112,12 +109,14 @@ public class GameLogic implements PlayableLogic {
         }
         pieces.remove(src);
         pieces.put(dst, p);
-        posSet.add(dst);
+        posSet.add(dst);        // dst is now an encountered position, so it should be added to the set
         p.addMove(dst);
         dst.stepHere(p);
 
         Map<Position, Piece> captures = new HashMap<>();
         Map.Entry<Position, Piece> capture;
+        // this line (and the following similar ones) first attempts a capture into the location, then if the capture
+        // returned non-null (the capture happened) adds it to the captures map
         if (null != (capture = attemptCapture(dst, dst.x() - 1, dst.y())))
             captures.put(capture.getKey(), capture.getValue());
         if (null != (capture = attemptCapture(dst, dst.x() + 1, dst.y())))
@@ -127,12 +126,13 @@ public class GameLogic implements PlayableLogic {
         if (null != (capture = attemptCapture(dst, dst.x(), dst.y() + 1)))
             captures.put(capture.getKey(), capture.getValue());
 
+        // log the move with all required information in the move history stack
         history.push(new GameMove(p, src, dst, captures));
 
         changeTurn();
 
         ConcretePlayer winner = checkWinner();
-        if (winner != null) {
+        if (winner != null) {   // game-end actions
             winner.addWin();
             logGame(winner);
         }
@@ -145,41 +145,44 @@ public class GameLogic implements PlayableLogic {
      * @param capturerP position from which the capture is trying to happen, should always have a piece in it
      * @param capturedX x coordinate trying to be captured
      * @param capturedY y coordinate trying to be captured
-     * @return the piece that was captured with its position, or null if no capture occurred
+     * @return the captured position and the captured piece, or null if no capture occurred
      * @throws IllegalArgumentException if {@code capturerP} does not host a piece
      */
     private Map.Entry<Position, Piece> attemptCapture(Position capturerP, int capturedX, int capturedY) {
-        if (!Position.isInsideBoard(capturedX, capturedY)) return null;    // no capture to happen
+        if (!Position.isInsideBoard(capturedX, capturedY)) return null;    // no capture to happen outside the board
         Position capturedP = new Position(capturedX, capturedY);
         if (capturedP.isCorner()) return null;     // there shouldn't be anything to capture in the corner
         Piece capturer = getPieceAtPosition(capturerP);
-        if (capturer == null) throw new IllegalArgumentException("Tried to capture from empty spot");
+        assert capturer != null : "Tried to capture from empty spot";   // should never happen
         if (!(capturer instanceof Pawn)) return null;     // king can't capture
         Piece captured = getPieceAtPosition(capturedP);
         if (captured == null) return null;     // no piece to capture
         if (captured.getOwner() == capturer.getOwner()) return null;   // can't capture an ally
         if (captured instanceof King) return null;     // king isn't captured normally, checked in checkWinner()
+        // calculate the direction from the capturer to the captured, adding this delta will give where the assist
+        // piece should be (other side of the captured)
         int dX = capturedP.x() - capturerP.x();
         int dY = capturedP.y() - capturerP.y();
-        if (!Position.isInsideBoard(capturedP.x() + dX, capturedP.y() + dY)) {
-            pieces.remove(capturedP);
+        if (!Position.isInsideBoard(capturedP.x() + dX, capturedP.y() + dY)) {      // capture against the edge
+            pieces.remove(capturedP);   // TODO: factor out the common code
             ((Pawn) capturer).addCapture();
-            return new AbstractMap.SimpleEntry<>(capturedP, captured);   // capture against the edge
+            return new AbstractMap.SimpleEntry<>(capturedP, captured);
         }
         Position assistP = new Position(capturedP.x() + dX, capturedP.y() + dY);
-        if (assistP.isCorner()) {
-            pieces.remove(capturedP);
+        if (assistP.isCorner()) {    // capture against a corner
+            pieces.remove(capturedP);   // TODO: factor out the common code
             ((Pawn) capturer).addCapture();
-            return new AbstractMap.SimpleEntry<>(capturedP, captured);    // captured is against a corner
+            return new AbstractMap.SimpleEntry<>(capturedP, captured);
         }
         Piece assist = getPieceAtPosition(assistP);
         if (assist == null) return null;   // no piece to assist the capture
         if (assist.getOwner() != capturer.getOwner()) return null;     // assist must be from same player
-        if (assist instanceof King) return null;   // king can't capture
-        pieces.remove(capturedP);
+        if (assist instanceof King) return null;   // king can't assist capture
+        pieces.remove(capturedP);   // TODO: factor out the common code
         ((Pawn) capturer).addCapture();
         return new AbstractMap.SimpleEntry<>(capturedP, captured);
     }
+    // TODO: continue from here
 
     /**
      * Returns the piece at the specified position.
