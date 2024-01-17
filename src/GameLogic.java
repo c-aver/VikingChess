@@ -1,4 +1,11 @@
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -209,7 +216,7 @@ public class GameLogic implements PlayableLogic {
     private ConcretePlayer checkWinner() {
         Position kingPos = pieces.entrySet().stream()
                 .filter(e -> e.getValue() instanceof King)
-                .findFirst().orElseThrow(() -> new NoSuchElementException("King not found in board"))
+                .findFirst().orElseThrow(() -> new RuntimeException("King not found in board"))
                 .getKey();
         if (kingPos.isCorner()) return p1;
         int boxedSides = 0;
