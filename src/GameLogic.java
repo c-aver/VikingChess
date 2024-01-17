@@ -285,7 +285,6 @@ public class GameLogic implements PlayableLogic {
         }
         move = history.pop();
 
-
         ConcretePiece stepper = move.piece();
         stepper.undoMove();
         move.destination().undoStep(stepper);
