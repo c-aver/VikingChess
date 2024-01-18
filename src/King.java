@@ -22,4 +22,9 @@ public class King extends ConcretePiece {
     public String getType() {
         return "♔";
     }
+
+    @Override
+    public String toString() {
+        return "K" + getId();
+    }
 }

@@ -130,4 +130,8 @@ public final class Position {
             return i - 1;
         });
     }
+
+    public String toString() {
+        return "(" + x + ", " + y + ")";
+    }
 }

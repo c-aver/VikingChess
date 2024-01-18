@@ -316,17 +316,13 @@ public class GameLogic implements PlayableLogic {
     private void logGame(Player winner) {
         GameLogger logger = new GameLogger(System.out);
 
-        Function<ConcretePiece, String> pieceFormat =
-                p -> "" + (p instanceof King ? 'K' : (p.getOwner().isPlayerOne() ? 'D' : 'A')) + p.getId() + ": ";
-        Function<Position, String> posFormat = p -> "(" + p.x() + ", " + p.y() + ")";
-
         Function<ConcretePiece, String> moveFormat = p -> {
             StringBuilder sb = new StringBuilder();
-            sb.append(pieceFormat.apply(p));
-            sb.append("[");
+            sb.append(p.toString());
+            sb.append(": [");
             Iterator<Position> it = p.getMoveHistory().iterator();
-            sb.append(posFormat.apply(it.next()));
-            while (it.hasNext()) sb.append(", ").append(posFormat.apply(it.next()));
+            sb.append(it.next().toString());
+            while (it.hasNext()) sb.append(", ").append(it.next().toString());
             sb.append("]");
             return sb.toString();
         };
@@ -334,16 +330,16 @@ public class GameLogic implements PlayableLogic {
                 cp -> cp.getNumOfSteps() > 0, moveFormat);
 
         PawnCaptureComparator capComp = new PawnCaptureComparator(winner);
-        Function<Pawn, String> capFormat = p -> pieceFormat.apply(p) + p.getCaptures() + " kills";
+        Function<Pawn, String> capFormat = p -> p.toString() + ": " + p.getCaptures() + " kills";
         Collection<Pawn> pawnSet = pieceSet.stream()
                 .filter(cp -> cp instanceof Pawn).map(cp -> (Pawn) cp).collect(Collectors.toSet());
         logger.logStream(pawnSet, capComp, p -> p.getCaptures() > 0, capFormat);
 
-        Function<ConcretePiece, String> distFormat = cp -> pieceFormat.apply(cp) + cp.getTotalMoveDist() + " squares";
+        Function<ConcretePiece, String> distFormat = cp -> cp.toString() + ": " + cp.getTotalMoveDist() + " squares";
         logger.logStream(pieceSet, new ConcretePieceMoveDistComparator(winner),
                 cp -> cp.getTotalMoveDist() > 0, distFormat);
 
-        Function<Position, String> stepFormat = p -> posFormat.apply(p) + p.getSteppedCount() + " pieces";
+        Function<Position, String> stepFormat = p -> p.toString() + p.getSteppedCount() + " pieces";
         logger.logStream(posSet, new PositionSteppedComparator(), p -> p.getSteppedCount() >= 2, stepFormat);
     }
 }

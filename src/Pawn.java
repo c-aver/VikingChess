@@ -49,4 +49,9 @@ public class Pawn extends ConcretePiece {
     public int getCaptures() {
         return captures;
     }
+
+    @Override
+    public String toString() {
+        return (getOwner().isPlayerOne() ? "D" : "A") + getId();
+    }
 }
