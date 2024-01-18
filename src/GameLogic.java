@@ -1,12 +1,9 @@
 import java.util.AbstractMap;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -315,31 +312,6 @@ public class GameLogic implements PlayableLogic {
      */
     private void logGame(Player winner) {
         GameLogger logger = new GameLogger(System.out);
-
-        Function<ConcretePiece, String> moveFormat = p -> {
-            StringBuilder sb = new StringBuilder();
-            sb.append(p.toString());
-            sb.append(": [");
-            Iterator<Position> it = p.getMoveHistory().iterator();
-            sb.append(it.next().toString());
-            while (it.hasNext()) sb.append(", ").append(it.next().toString());
-            sb.append("]");
-            return sb.toString();
-        };
-        logger.logStream(pieceSet, new ConcretePieceMoveCountComparator(winner),
-                cp -> cp.getNumOfSteps() > 0, moveFormat);
-
-        PawnCaptureComparator capComp = new PawnCaptureComparator(winner);
-        Function<Pawn, String> capFormat = p -> p.toString() + ": " + p.getCaptures() + " kills";
-        Collection<Pawn> pawnSet = pieceSet.stream()
-                .filter(cp -> cp instanceof Pawn).map(cp -> (Pawn) cp).collect(Collectors.toSet());
-        logger.logStream(pawnSet, capComp, p -> p.getCaptures() > 0, capFormat);
-
-        Function<ConcretePiece, String> distFormat = cp -> cp.toString() + ": " + cp.getTotalMoveDist() + " squares";
-        logger.logStream(pieceSet, new ConcretePieceMoveDistComparator(winner),
-                cp -> cp.getTotalMoveDist() > 0, distFormat);
-
-        Function<Position, String> stepFormat = p -> p.toString() + p.getSteppedCount() + " pieces";
-        logger.logStream(posSet, new PositionSteppedComparator(), p -> p.getSteppedCount() >= 2, stepFormat);
+        logger.logGame(winner, posSet, pieceSet);
     }
 }

@@ -1,8 +1,11 @@
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * This class represent a logger for logging game statistics.
@@ -29,8 +32,36 @@ public class GameLogger {
      * @param format the format that determines how the information will be printed
      * @param <T> the type of objects from which the information is extracted
      */
-    public <T> void logStream(Collection<T> c, Comparator<T> comp, Predicate<T> filter, Function<T, String> format) {
+    private <T> void log(Collection<T> c, Comparator<T> comp, Predicate<T> filter, Function<T, String> format) {
         c.stream().filter(filter).sorted(comp).map(format).forEach(out::println);
         sectionBreak();
+    }
+
+    public void logGame(Player winner, Set<Position> posSet, Set<ConcretePiece> pieceSet) {
+        Function<ConcretePiece, String> moveFormat = p -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append(p.toString());
+            sb.append(": [");
+            Iterator<Position> it = p.getMoveHistory().iterator();
+            sb.append(it.next().toString());
+            while (it.hasNext()) sb.append(", ").append(it.next().toString());
+            sb.append("]");
+            return sb.toString();
+        };
+        log(pieceSet, new ConcretePieceMoveCountComparator(winner),
+                cp -> cp.getNumOfSteps() > 0, moveFormat);
+
+        PawnCaptureComparator capComp = new PawnCaptureComparator(winner);
+        Function<Pawn, String> capFormat = p -> p.toString() + ": " + p.getCaptures() + " kills";
+        Collection<Pawn> pawnSet = pieceSet.stream()
+                .filter(cp -> cp instanceof Pawn).map(cp -> (Pawn) cp).collect(Collectors.toSet());
+        log(pawnSet, capComp, p -> p.getCaptures() > 0, capFormat);
+
+        Function<ConcretePiece, String> distFormat = cp -> cp.toString() + ": " + cp.getTotalMoveDist() + " squares";
+        log(pieceSet, new ConcretePieceMoveDistComparator(winner),
+                cp -> cp.getTotalMoveDist() > 0, distFormat);
+
+        Function<Position, String> stepFormat = p -> p.toString() + p.getSteppedCount() + " pieces";
+        log(posSet, new PositionSteppedComparator(), p -> p.getSteppedCount() >= 2, stepFormat);
     }
 }
