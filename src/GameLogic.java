@@ -31,7 +31,7 @@ public class GameLogic implements PlayableLogic {
      * @param piece the piece that was moved
      * @param source the piece's previous position
      * @param destination the piece's new position
-     * @param captures a map of the pieces that were captured, tied to their death location
+     * @param captures a map of the pieces that were captured, tied to their death locations
      */
     private record GameMove(ConcretePiece piece, Position source, Position destination, Map<Position, Piece> captures) { }
     private final Stack<GameMove> history = new Stack<>();
@@ -177,7 +177,6 @@ public class GameLogic implements PlayableLogic {
         ((Pawn) capturer).addCapture();
         return new AbstractMap.SimpleEntry<>(capturedP, captured);
     }
-    // TODO: continue inspection from here
 
     /**
      * Returns the piece at the specified position.
@@ -212,30 +211,32 @@ public class GameLogic implements PlayableLogic {
      * @return the winning player, or {@code null} if no player has won yet
      */
     private ConcretePlayer checkWinner() {
+        // the following lines find the king's position
         Position kingPos = pieces.entrySet().stream()
                 .filter(e -> e.getValue() instanceof King)
                 .findFirst().orElseThrow(() -> new RuntimeException("King not found in board"))
                 .getKey();
-        if (kingPos.isCorner()) return p1;
-        int boxedSides = 0;
+        if (kingPos.isCorner()) return p1;  // king is in a corner, defender wins
+        int boxedSides = 0;     // number of sides from which the king is boxed, either by the edge or by an attacker
         if (Position.isInsideBoard(kingPos.x() - 1, kingPos.y())) {
             Position side = new Position(kingPos.x() - 1, kingPos.y());
+            // check if there is a piece on the side, and if it is from the attacker
             if (getPieceAtPosition(side) != null && getPieceAtPosition(side).getOwner() == p2) boxedSides += 1;
         } else boxedSides += 1;     // king is against the edge
         if (Position.isInsideBoard(kingPos.x() + 1, kingPos.y())) {
             Position side = new Position(kingPos.x() + 1, kingPos.y());
             if (getPieceAtPosition(side) != null && getPieceAtPosition(side).getOwner() == p2) boxedSides += 1;
-        } else boxedSides += 1;     // king is against the edge
+        } else boxedSides += 1;
         if (Position.isInsideBoard(kingPos.x(), kingPos.y() - 1)) {
             Position side = new Position(kingPos.x(), kingPos.y() - 1);
             if (getPieceAtPosition(side) != null && getPieceAtPosition(side).getOwner() == p2) boxedSides += 1;
-        } else boxedSides += 1;     // king is against the edge
+        } else boxedSides += 1;
         if (Position.isInsideBoard(kingPos.x(), kingPos.y() + 1)) {
             Position side = new Position(kingPos.x(), kingPos.y() + 1);
             if (getPieceAtPosition(side) != null && getPieceAtPosition(side).getOwner() == p2) boxedSides += 1;
-        } else boxedSides += 1;     // king is against the edge
-        if (boxedSides == 4) return p2;
-        return null;
+        } else boxedSides += 1;
+        if (boxedSides == 4) return p2;     // if king is boxed from all sides, attacker wins
+        return null;    // if we got here, no player has won yet
     }
 
     /**
@@ -258,9 +259,9 @@ public class GameLogic implements PlayableLogic {
     }
 
     /**
-     * This method resets the game to it initial state. This resets the board state, piece and position statistics,
+     * This method resets the game to its initial state. This resets the board state, piece and position statistics,
      * and clears the history.
-     * <br>The number of wins for each player is not cleared by this operation.
+     * <br>Note: The number of wins for each player is not cleared by this operation.
      */
     @Override
     public void reset() {
@@ -277,22 +278,25 @@ public class GameLogic implements PlayableLogic {
      */
     @Override
     public void undoLastMove() {
-        GameMove move;
         if (history.isEmpty()) {
-            return;
+            return;     // no move to undo
         }
-        move = history.pop();
-
+        GameMove move = history.pop();
         ConcretePiece stepper = move.piece();
+
+        // notify relevant objects of the undo
         stepper.undoMove();
         move.destination().undoStep(stepper);
 
+        // move the piece back
         pieces.remove(move.destination());
         pieces.put(move.source(), stepper);
 
+        // if the moved piece is a pawn, notify it of the undo (for capture statistics) and restore the captured pieces
         if (stepper instanceof Pawn p) p.undoCaptures(move.captures().size());
         pieces.putAll(move.captures());
 
+        // switch turns back
         changeTurn();
     }
 
