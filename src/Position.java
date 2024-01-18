@@ -1,3 +1,4 @@
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -134,4 +135,18 @@ public final class Position {
     public String toString() {
         return "(" + x + ", " + y + ")";
     }
+
+    /**
+     * A comparator that compares two positions according to the following rules:
+     * <br>First, by number of unique pieces stepped on, in reverse order.
+     * <br>If they are equal, by x values.
+     * <br>If they are equal, by y values.
+     */
+    public static final Comparator<Position> steppedComp = (p1, p2) -> {
+        int sComp = Integer.compare(p2.getSteppedCount(), p1.getSteppedCount());
+        if (sComp != 0) return sComp;
+        int xComp = Integer.compare(p1.x(), p2.x());
+        if (xComp != 0) return xComp;
+        return Integer.compare(p1.y(), p2.y());
+    };
 }

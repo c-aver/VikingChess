@@ -1,3 +1,5 @@
+import java.util.Comparator;
+
 /**
  * This class represents a pawn piece for the game.
  */
@@ -53,5 +55,25 @@ public class Pawn extends ConcretePiece {
     @Override
     public String toString() {
         return (getOwner().isPlayerOne() ? "D" : "A") + getId();
+    }
+
+    /**
+     * Returns a comparator that compares two {@code Pawn}s according to the following rules:
+     * <br>First, reverse order by number of captures.
+     * <br>If they are equal, forward order by their IDs.
+     * <br>If they are also equal, piece whose owner is the winner comes first.
+     * @param winner the winner of the game, required for the comparison
+     * @return the required comparator
+     */
+    public static Comparator<Pawn> getCaptureComparator(Player winner) {
+        return (o1, o2) -> {
+            int cComp = Integer.compare(o2.getCaptures(), o1.getCaptures());
+            if (cComp != 0) return cComp;
+            int iComp = Integer.compare(o1.getId(), o2.getId());
+            if (iComp != 0) return iComp;
+            if (o1.getOwner() == o2.getOwner()) return 0;   // should be unreachable
+            if (o1.getOwner() == winner) return -1;
+            return 1;
+        };
     }
 }

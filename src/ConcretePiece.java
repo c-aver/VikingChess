@@ -1,4 +1,5 @@
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Stack;
 
 /**
@@ -81,5 +82,42 @@ public abstract class ConcretePiece implements Piece {
 
     public int getId() {
         return id;
+    }
+
+    /**
+     * Returns a comparator that compares two {@code ConcretePiece}s according to the following rules:
+     * <br>Winner comes first.
+     * <br>Then, order by number of steps.
+     *  <br>If they are equal, order by piece ID.
+     * @param winner the winner of the game, required for comparison
+     * @return the required comparator
+     */
+    public static Comparator<ConcretePiece> getMoveCountComparator(Player winner) {
+        return (o1, o2) -> {
+            if (o1.getOwner() != o2.getOwner()) return o1.getOwner() == winner ? -1 : 1;
+            int dComp = Integer.compare(o1.getNumOfSteps(), o2.getNumOfSteps());
+            if (dComp != 0) return dComp;
+            return Integer.compare(o1.getId(), o2.getId());
+        };
+    }
+
+    /**
+     * Returns a comparator that compares two {@code ConcretePiece}s according to the following rules:
+     * <br>First, reverse order by total move distance.
+     * <br>If they are equal, forward order by their IDs.
+     * <br>If they are also equal, piece whose owner is the winner comes first.
+     * @param winner the winner of the game, required for comparison
+     * @return the required comparator
+     */
+    public static Comparator<ConcretePiece> getMoveDistComparator(Player winner) {
+        return (o1, o2) -> {
+            int dComp = Integer.compare(o2.getTotalMoveDist(), o1.getTotalMoveDist());
+            if (dComp != 0) return dComp;
+            int iComp = Integer.compare(o1.getId(), o2.getId());
+            if (iComp != 0) return iComp;
+            if (o1.getOwner() == o2.getOwner()) return 0;   // should be unreachable
+            if (o1.getOwner() == winner) return -1;
+            return 1;
+        };
     }
 }

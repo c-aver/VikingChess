@@ -48,20 +48,19 @@ public class GameLogger {
             sb.append("]");
             return sb.toString();
         };
-        log(pieceSet, new ConcretePieceMoveCountComparator(winner),
+        log(pieceSet, ConcretePiece.getMoveCountComparator(winner),
                 cp -> cp.getNumOfSteps() > 0, moveFormat);
 
-        PawnCaptureComparator capComp = new PawnCaptureComparator(winner);
         Function<Pawn, String> capFormat = p -> p.toString() + ": " + p.getCaptures() + " kills";
         Collection<Pawn> pawnSet = pieceSet.stream()
                 .filter(cp -> cp instanceof Pawn).map(cp -> (Pawn) cp).collect(Collectors.toSet());
-        log(pawnSet, capComp, p -> p.getCaptures() > 0, capFormat);
+        log(pawnSet, Pawn.getCaptureComparator(winner), p -> p.getCaptures() > 0, capFormat);
 
         Function<ConcretePiece, String> distFormat = cp -> cp.toString() + ": " + cp.getTotalMoveDist() + " squares";
-        log(pieceSet, new ConcretePieceMoveDistComparator(winner),
+        log(pieceSet, ConcretePiece.getMoveDistComparator(winner),
                 cp -> cp.getTotalMoveDist() > 0, distFormat);
 
         Function<Position, String> stepFormat = p -> p.toString() + p.getSteppedCount() + " pieces";
-        log(posSet, new PositionSteppedComparator(), p -> p.getSteppedCount() >= 2, stepFormat);
+        log(posSet, Position.steppedComp, p -> p.getSteppedCount() >= 2, stepFormat);
     }
 }
