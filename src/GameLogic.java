@@ -163,26 +163,21 @@ public class GameLogic implements PlayableLogic {
         // piece should be (other side of the captured)
         int dX = capturedP.x() - capturerP.x();
         int dY = capturedP.y() - capturerP.y();
-        if (!Position.isInsideBoard(capturedP.x() + dX, capturedP.y() + dY)) {      // capture against the edge
-            pieces.remove(capturedP);   // TODO: factor out the common code
-            ((Pawn) capturer).addCapture();
-            return new AbstractMap.SimpleEntry<>(capturedP, captured);
+        if (Position.isInsideBoard(capturedP.x() + dX, capturedP.y() + dY)) {   // otherwise capture against the edge
+            Position assistP = new Position(capturedP.x() + dX, capturedP.y() + dY);
+            if (!assistP.isCorner()) {    // otherwise capture against a corner
+                Piece assist = getPieceAtPosition(assistP);
+                if (assist == null) return null;   // no piece to assist the capture
+                if (assist.getOwner() != capturer.getOwner()) return null;     // assist must be from same player
+                if (assist instanceof King) return null;   // king can't assist capture
+            }
         }
-        Position assistP = new Position(capturedP.x() + dX, capturedP.y() + dY);
-        if (assistP.isCorner()) {    // capture against a corner
-            pieces.remove(capturedP);   // TODO: factor out the common code
-            ((Pawn) capturer).addCapture();
-            return new AbstractMap.SimpleEntry<>(capturedP, captured);
-        }
-        Piece assist = getPieceAtPosition(assistP);
-        if (assist == null) return null;   // no piece to assist the capture
-        if (assist.getOwner() != capturer.getOwner()) return null;     // assist must be from same player
-        if (assist instanceof King) return null;   // king can't assist capture
-        pieces.remove(capturedP);   // TODO: factor out the common code
+        // if we didn't return null up to here, the capture is valid and we can perform its actions
+        pieces.remove(capturedP);
         ((Pawn) capturer).addCapture();
         return new AbstractMap.SimpleEntry<>(capturedP, captured);
     }
-    // TODO: continue from here
+    // TODO: continue inspection from here
 
     /**
      * Returns the piece at the specified position.
