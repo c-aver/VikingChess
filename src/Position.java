@@ -100,7 +100,7 @@ public final class Position {
      * @return true if this {@code Position} is a corner
      */
     public boolean isCorner() {
-        return x % (BOARD_SIZE - 1)  == 0 && y % (BOARD_SIZE - 1) == 0;
+        return x % (BOARD_SIZE - 1) == 0 && y % (BOARD_SIZE - 1) == 0;
     }
 
     /**
