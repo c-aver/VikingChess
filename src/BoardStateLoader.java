@@ -40,25 +40,79 @@ public class BoardStateLoader {
      * @throws IllegalArgumentException if a line does not match the format
      */
     public Map<Position, Piece> loadFile(String resourcePath) {
-        InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourcePath);
-        if (stream == null) {
-            throw new RuntimeException("Resource does not exists: " + resourcePath);
-        }
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+        // CHANGE: replaced resource loading lines
+        // InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourcePath);
+        // if (stream == null) {
+        //     throw new RuntimeException("Resource does not exists: " + resourcePath);
+        // }
+        // BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+
+        // CHANGE: use hard-coded String instead
+        String boardState = """
+                (3, 0) -> 2p1
+                (4, 0) -> 2p2
+                (5, 0) -> 2p3
+                (6, 0) -> 2p4
+                (7, 0) -> 2p5
+                (5, 1) -> 2p6
+
+                (0, 3) -> 2p7
+                (0, 4) -> 2p9
+                (0, 5) -> 2p11
+                (0, 6) -> 2p15
+                (0, 7) -> 2p17
+                (1, 5) -> 2p12
+
+                (5, 3) -> 1p1
+                (4, 4) -> 1p2
+                (5, 4) -> 1p3
+                (6, 4) -> 1p4
+                (3, 5) -> 1p5
+                (4, 5) -> 1p6
+                (5, 5) -> 1k7
+                (6, 5) -> 1p8
+                (7, 5) -> 1p9
+                (4, 6) -> 1p10
+                (5, 6) -> 1p11
+                (6, 6) -> 1p12
+                (5, 7) -> 1p13
+
+                (10, 3) -> 2p8
+                (10, 4) -> 2p10
+                (9, 5)  -> 2p13
+                (10, 5) -> 2p14
+                (10, 6) -> 2p16
+                (10, 7) -> 2p18
+
+                (3, 10) -> 2p20
+                (4, 10) -> 2p21
+                (5, 9)  -> 2p19
+                (5, 10) -> 2p22
+                (6, 10) -> 2p23
+                (7, 10) -> 2p24"""
+                ;
         Map<Position, Piece> result = new HashMap<>();
-        String line;
-        try {
-            line = reader.readLine();
-            while (line != null) {
+
+        // CHANGE: replace line reading from reader
+        // String line;
+        // try {
+        //    line = reader.readLine();
+
+        // CHANGE: loop over split string instead
+        String[] lines = boardState.split("\n");
+        for (String line : lines)
+            // while (line != null) {
                 if (!line.isEmpty()) {
                     AbstractMap.Entry<Position, Piece> entry = parseLine(line);
                     result.put(entry.getKey(), entry.getValue());
                 }
-                line = reader.readLine();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Error reading resource: " + resourcePath);
-        }
+                // line = reader.readLine();
+            // }
+
+        // CHANGE: exception handling no longer necessary
+        // } catch (IOException e) {
+        //     throw new RuntimeException("Error reading resource: " + resourcePath);
+        // }
         return result;
     }
 
