@@ -36,7 +36,7 @@ public class GameLogic implements PlayableLogic {
     private void initializeBoard() {
         pieces.clear();
         BoardStateLoader parser = new BoardStateLoader(p1, p2);
-        Map<Position, Piece> loaded = parser.loadFile("resources/InitialBoardState.txt");
+        Map<Position, Piece> loaded = parser.loadFile(/* "resources/InitialBoardState.txt" */);
         pieces.putAll(loaded);
         posSet.addAll(loaded.keySet());
         pieceSet.addAll(loaded.values().stream().map(p -> (ConcretePiece) p).collect(Collectors.toSet()));

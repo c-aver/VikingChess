@@ -1,7 +1,7 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+// import java.io.BufferedReader;
+// import java.io.IOException;
+// import java.io.InputStream;
+// import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,12 +34,12 @@ public class BoardStateLoader {
      * <br>{t} is the type of the piece ('p' for pawn, 'k' for king).
      * <br>{id} is the ID of the piece for logging purposes.
      * <p>Lines are only allowed to either match the format precisely or be empty.
-     * @param resourcePath the path to the resource file to be parsed
+     // * @param resourcePath the path to the resource file to be parsed
      * @return a map of the loaded pieces
      * @throws RuntimeException if there was an error opening or reading the resource
      * @throws IllegalArgumentException if a line does not match the format
      */
-    public Map<Position, Piece> loadFile(String resourcePath) {
+    public Map<Position, Piece> loadFile(/* String resourcePath */) {
         // CHANGE: replaced resource loading lines
         // InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourcePath);
         // if (stream == null) {
